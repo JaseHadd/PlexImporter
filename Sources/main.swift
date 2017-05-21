@@ -42,13 +42,14 @@ for outputLine in test.output {
     
     guard let id = components.first, let name = components.last else { continue }
     
-    var isDir: ObjCBool = false;
     let fileManager = FileManager()
+    let torrentURL = URL(fileURLWithPath: basePath.appending(name))
     
-    if fileManager.fileExists(atPath: basePath.appending(name), isDirectory: &isDir) {
+    if let resourceValues = try? torrentURL.resourceValues(forKeys: [.isDirectoryKey]) {
         let torrentPath: String
         let filePattern: String?
-        if isDir.boolValue {
+        
+        if resourceValues.isDirectory! {
             torrentPath = basePath.appending(name)
         }
         else {
@@ -57,7 +58,11 @@ for outputLine in test.output {
         }
         
         let files = try! fileManager.contentsOfDirectory(atPath: torrentPath) // we know at this point that it IS a valid directory
+        print(files);
         
+    }
+    else {
+        // file doesn't exist
     }
     
     // ugh. if file exists ... if file, else if directory ... also have to update other script because it's adding them every hour no matter what.
