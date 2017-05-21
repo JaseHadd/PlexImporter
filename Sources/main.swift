@@ -62,7 +62,7 @@ for outputLine in test.output {
         
     }
     else {
-        // file doesn't exist
+        print(basePath.appending(name), "doesn't exist", separator: " ")
     }
     
     // ugh. if file exists ... if file, else if directory ... also have to update other script because it's adding them every hour no matter what.
