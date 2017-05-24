@@ -57,7 +57,7 @@ func getDirectoryURL(path: String, relativeTo url: URL) -> URL {
     return newURL
 }
 
-func processFile(withURL url: URL) {
+func processFile(withURL url: URL) -> Bool {
     let mediaExtensions = ["webm", "mkv", "flv", "vog", "ogv", "avi", "mov", "qt", "wmv", "yuv", "rm", "rmvb", "amv", "mp4", "m4p", "m4v", "mpg", "mp2", "mpeg", "mpe", "mpv", "m2v", "m4v", "3gpp", "3gpp2", "flv", "f4v", "f4p", "f4a", "f4b", "srt"]
     let targetDirectory = URL(fileURLWithPath: "/var/lib/plexmediaserver/TV Shows", isDirectory: true)
     let regex = try! NSRegularExpression(pattern: "([^/]*)[. ][Ss](\\d{1,2})[Ee](\\d{1,2})", options: [])
@@ -69,7 +69,7 @@ func processFile(withURL url: URL) {
         let fileName = url.lastPathComponent
         let results = regex.matches(in: fileName, options: .init(rawValue: 0), range: NSMakeRange(0, fileName.utf16.count))
         
-        if results.count == 0 { return }
+        if results.count == 0 { return false; }
         
         #if os(OSX) || os(iOS)
             var showName = fileName.substring(with: fileName.range(from: results[0].rangeAt(1))!)
@@ -110,18 +110,21 @@ func processFile(withURL url: URL) {
         if let _ = try? fileManager.removeItem(at: url) {
             print("Deleted ", url.path)
         } else {
-            print("Tried to delete episode, but failed: ", url.path)
+            print("Tried to delete file, but failed: ", url.path)
         }
     }
     
     else {
         print("Skipping episode: ", url.path)
+        return false;
     }
+    return true;
 }
 
 let basePath = "/var/lib/transmission-daemon/downloads/"
 let test = runCommand(cmd: "/usr/bin/transmission-remote", args: "-l");
 for outputLine in test.output {
+    var delete = false
     let components = outputLine.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
     if components.count < 5 || components[4] != "Done" { continue }
     
@@ -131,16 +134,19 @@ for outputLine in test.output {
     let torrentURL = URL(fileURLWithPath: basePath.appending(name))
     
     if let files = try? fileManager.contentsOfDirectory(at: torrentURL, includingPropertiesForKeys: nil, options: .skipsSubdirectoryDescendants) {
-        files.forEach { file in processFile(withURL: file) }
+        files.forEach { file in if(processFile(withURL: file)) { delete = true } }
     }
     else if(fileManager.fileExists(atPath: torrentURL.path)) {
-        processFile(withURL: torrentURL)
+        delete = processFile(withURL: torrentURL)
     }
     else {
         print("Error processing", name, ": couldn't find file.")
     }
     
     runCommand(cmd: "/usr/bin/transmission-remote", args: "--torrent", id, "--remove")
+    if delete {
+        try? fileManager.removeItem(at: torrentURL)
+    }
     
     // ugh. if file exists ... if file, else if directory ... also have to update other script because it's adding them every hour no matter what.
 }
