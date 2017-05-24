@@ -58,7 +58,7 @@ func getDirectoryURL(path: String, relativeTo url: URL) -> URL {
 }
 
 func processFile(withURL url: URL) {
-    let videoExtensions = [".webm", ".mkv", ".flv", ".vog", ".ogv", ".avi", ".mov", ".qt", ".wmv", ".yuv", ".rm", ".rmvb", ".amv", ".mp4", ".m4p", ".m4v", ".mpg", ".mp2", ".mpeg", ".mpe", ".mpv", ".m2v", ".m4v", ".3gpp", ".3gpp2", ".flv", ".f4v", ".f4p", ".f4a", ".f4b"]
+    let videoExtensions = ["webm", "mkv", "flv", "vog", "ogv", "avi", "mov", "qt", "wmv", "yuv", "rm", "rmvb", "amv", "mp4", "m4p", "m4v", "mpg", "mp2", "mpeg", "mpe", "mpv", "m2v", "m4v", "3gpp", "3gpp2", "flv", "f4v", "f4p", "f4a", "f4b"]
     let targetDirectory = URL(fileURLWithPath: "/var/lib/plexmediaserver/", isDirectory: true)
     
     if videoExtensions.contains(url.pathExtension) {
