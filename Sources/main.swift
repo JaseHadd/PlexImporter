@@ -59,14 +59,14 @@ func getDirectoryURL(path: String, relativeTo url: URL) -> URL {
 
 func processFile(withURL url: URL) {
     let videoExtensions = ["webm", "mkv", "flv", "vog", "ogv", "avi", "mov", "qt", "wmv", "yuv", "rm", "rmvb", "amv", "mp4", "m4p", "m4v", "mpg", "mp2", "mpeg", "mpe", "mpv", "m2v", "m4v", "3gpp", "3gpp2", "flv", "f4v", "f4p", "f4a", "f4b"]
-    let targetDirectory = URL(fileURLWithPath: "/var/lib/plexmediaserver/", isDirectory: true)
+    let targetDirectory = URL(fileURLWithPath: "/var/lib/plexmediaserver/TV Shows", isDirectory: true)
+    let regex = try! NSRegularExpression(pattern: "([^/]*)[. ][Ss](\\d{1,2})[Ee](\\d{1,2})", options: [])
+    
+    let fileManager = FileManager.default
     
     if videoExtensions.contains(url.pathExtension) {
         let stringsToDelete = ["US", "UK"]
-        
-        let fileManager = FileManager.default
         let fileName = url.lastPathComponent
-        let regex = try! NSRegularExpression(pattern: "([^/]*)[. ][Ss](\\d{1,2})[Ee](\\d{1,2}).*\\.([\\w\\d]{3,4})", options: [])
         let results = regex.matches(in: fileName, options: .init(rawValue: 0), range: NSMakeRange(0, fileName.utf16.count))
         
         #if os(OSX) || os(iOS)
@@ -80,7 +80,9 @@ func processFile(withURL url: URL) {
         #endif
         
         showName = showName.replacingOccurrences(of: ".", with: " ", options: .init(rawValue: 0), range: nil)
+        print("Before: ", showName)
         showName = showName.replacingOccurrences(of: "\\d{4}", with: "($1)", options: .regularExpression, range: nil)
+        print("After: ", showName)
         showName = showName.components(separatedBy: " ").joined(separator: " ")
         
         let targetPath = "\(showName)/Season \(seasonNumber)"
@@ -88,10 +90,17 @@ func processFile(withURL url: URL) {
         
         let seasonDirectory = getDirectoryURL(path: targetPath, relativeTo: targetDirectory)
         
-        print("Candidate:", seasonDirectory.path, targetFile, separator: " ")
+//        if let _ = try? fileManager.moveItem(at: url, to: seasonDirectory.appendingPathComponent(targetFile)) {
+//            print("Moved episode to ", seasonDirectory.appendingPathComponent(targetFile))
+//        }
+        
     }
     
-    else { print(url.path, " doesn't exist") }
+    else if url.deletingLastPathComponent().lastPathComponent.range(of: regex.pattern, options: .regularExpression, range: nil, locale: nil) != nil {
+        if let _ = try? fileManager.removeItem(at: url) {
+            print("Deleted ", url.path)
+        }
+    }
 }
 
 let basePath = "/var/lib/transmission-daemon/downloads/"
