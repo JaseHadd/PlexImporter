@@ -90,6 +90,12 @@ func processFile(withURL url: URL) {
         let seasonDirectory = getDirectoryURL(path: targetPath, relativeTo: targetDirectory)
         let targetURL = seasonDirectory.appendingPathComponent(targetFile)
         
+        if fileManager.fileExists(atPath: targetURL.path) {
+            print("Deleting original item")
+            if let _ = try? fileManager.removeItem(at: targetURL) {
+                print("Success")
+            }
+        }
         print("Moving episode to ", targetURL.path)
         if let _ = try? fileManager.moveItem(at: url, to: targetURL) {
             print("Moved episode to ", targetURL.path)
