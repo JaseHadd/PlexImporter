@@ -84,6 +84,16 @@ func processFile(withURL url: URL) -> Bool {
         showName = showName.replacingOccurrences(of: "([^A-Z])\\.([\\w\\d])", with: "$1 $2", options: .regularExpression, range: nil)
         showName = showName.replacingOccurrences(of: "(\\d{4})", with: "($1)", options: .regularExpression, range: nil)
         
+        showName.components(separatedBy: " ").filter { $0.hasSuffix("s") }.forEach { word in
+            var wordWithApostrophe = word
+            wordWithApostrophe.insert("'", at: wordWithApostrophe.index(before: wordWithApostrophe.endIndex))
+            
+            let newShowName = showName.replacingOccurrences(of: word, with: wordWithApostrophe)
+            if fileManager.fileExists(atPath: targetDirectory.appendingPathComponent(newShowName).path) {
+                showName = newShowName
+            }
+        }
+        
         let targetPath = "\(showName)/Season \(seasonNumber)"
         let targetFile = "\(showName) - s\(seasonNumber)e\(episodeNumber).\(url.pathExtension)"
         
