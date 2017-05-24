@@ -134,5 +134,7 @@ for outputLine in test.output {
         print("Error processing", name, ": couldn't find file.")
     }
     
+    runCommand(cmd: "/usr/bin/transmission-remote", args: "--torrent", id, "--remove")
+    
     // ugh. if file exists ... if file, else if directory ... also have to update other script because it's adding them every hour no matter what.
 }
