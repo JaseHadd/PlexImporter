@@ -69,6 +69,8 @@ func processFile(withURL url: URL) {
         let fileName = url.lastPathComponent
         let results = regex.matches(in: fileName, options: .init(rawValue: 0), range: NSMakeRange(0, fileName.utf16.count))
         
+        if results.count == 0 { return }
+        
         #if os(OSX) || os(iOS)
             var showName = fileName.substring(with: fileName.range(from: results[0].rangeAt(1))!)
             let seasonNumber = fileName.substring(with: fileName.range(from: results[0].rangeAt(2))!)
@@ -80,18 +82,17 @@ func processFile(withURL url: URL) {
         #endif
         
         showName = showName.replacingOccurrences(of: ".", with: " ", options: .init(rawValue: 0), range: nil)
-        print("Before: ", showName)
         showName = showName.replacingOccurrences(of: "(\\d{4})", with: "($1)", options: .regularExpression, range: nil)
-        print("After: ", showName)
-        showName = showName.components(separatedBy: " ").joined(separator: " ")
         
         let targetPath = "\(showName)/Season \(seasonNumber)"
         let targetFile = "\(showName) - s\(seasonNumber)e\(episodeNumber).\(url.pathExtension)"
         
         let seasonDirectory = getDirectoryURL(path: targetPath, relativeTo: targetDirectory)
+        let targetURL = seasonDirectory.appendingPathComponent(targetFile)
         
-        if let _ = try? fileManager.moveItem(at: url, to: seasonDirectory.appendingPathComponent(targetFile)) {
-            print("Moved episode to ", seasonDirectory.appendingPathComponent(targetFile))
+        print("Moving episode to ", targetURL.path)
+        if let _ = try? fileManager.moveItem(at: url, to: targetURL) {
+            print("Moved episode to ", targetURL.path)
         }
         
     }
