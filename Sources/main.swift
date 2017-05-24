@@ -89,11 +89,9 @@ func processFile(withURL url: URL) {
         let seasonDirectory = getDirectoryURL(path: targetPath, relativeTo: targetDirectory)
         
         print("Candidate:", seasonDirectory.path, targetFile, separator: " ")
-        
-        
-        
-//        ([^/]*)[. ][Ss](\d{1,2})[Ee](\d{1,2}).*\.([\w\d]{3,4})
     }
+    
+    else { print(url.path, " doesn't exist") }
 }
 
 let basePath = "/var/lib/transmission-daemon/downloads/"
