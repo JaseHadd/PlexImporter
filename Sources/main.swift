@@ -81,7 +81,7 @@ func processFile(withURL url: URL) -> Bool {
             let episodeNumber = fileName.substring(with: fileName.range(from: results[0].range(at: 3))!)
         #endif
         
-        showName = showName.replacingOccurrences(of: ".", with: " ", options: .init(rawValue: 0), range: nil)
+        showName = showName.replacingOccurrences(of: "([^A-Z])\\.([\\w\\d])", with: "$1 $2", options: .regularExpression, range: nil)
         showName = showName.replacingOccurrences(of: "(\\d{4})", with: "($1)", options: .regularExpression, range: nil)
         
         let targetPath = "\(showName)/Season \(seasonNumber)"
