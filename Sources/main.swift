@@ -94,13 +94,22 @@ func processFile(withURL url: URL) {
         if let _ = try? fileManager.moveItem(at: url, to: targetURL) {
             print("Moved episode to ", targetURL.path)
         }
+        else {
+            print("Unable to move episode");
+        }
         
     }
     
     else if url.deletingLastPathComponent().lastPathComponent.range(of: regex.pattern, options: .regularExpression, range: nil, locale: nil) != nil {
         if let _ = try? fileManager.removeItem(at: url) {
             print("Deleted ", url.path)
+        } else {
+            print("Tried to delete episode, but failed: ", url.path)
         }
+    }
+    
+    else {
+        print("Skipping episode: ", url.path)
     }
 }
 
