@@ -66,7 +66,7 @@ func processFile(withURL url: URL) {
         
         let fileManager = FileManager.default
         let fileName = url.lastPathComponent
-        let regex = try! NSRegularExpression(pattern: "([^/]*)[. ][Ss](\\d{1,2})[Ee](\\d{1,2}).*\\.([\\w\\d]{3,4})")
+        let regex = try! NSRegularExpression(pattern: "([^/]*)[. ][Ss](\\d{1,2})[Ee](\\d{1,2}).*\\.([\\w\\d]{3,4})", options: [])
         let results = regex.matches(in: fileName, options: .init(rawValue: 0), range: NSMakeRange(0, fileName.utf16.count))
         
         var showName = fileName.substring(with: fileName.range(from: results[0].rangeAt(1))!)
