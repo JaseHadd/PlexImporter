@@ -69,12 +69,19 @@ func processFile(withURL url: URL) {
         let regex = try! NSRegularExpression(pattern: "([^/]*)[. ][Ss](\\d{1,2})[Ee](\\d{1,2}).*\\.([\\w\\d]{3,4})", options: [])
         let results = regex.matches(in: fileName, options: .init(rawValue: 0), range: NSMakeRange(0, fileName.utf16.count))
         
-        var showName = fileName.substring(with: fileName.range(from: results[0].rangeAt(1))!)
-        let seasonNumber = fileName.substring(with: fileName.range(from: results[0].rangeAt(2))!)
-        let episodeNumber = fileName.substring(with: fileName.range(from: results[0].rangeAt(3))!)
+        #if os(OSX) || os(iOS)
+            var showName = fileName.substring(with: fileName.range(from: results[0].rangeAt(1))!)
+            let seasonNumber = fileName.substring(with: fileName.range(from: results[0].rangeAt(2))!)
+            let episodeNumber = fileName.substring(with: fileName.range(from: results[0].rangeAt(3))!)
+        #else
+            var showName = fileName.substring(with: fileName.range(from: results[0].range(at: 1))!)
+            let seasonNumber = fileName.substring(with: fileName.range(from: results[0].range(at: 2))!)
+            let episodeNumber = fileName.substring(with: fileName.range(from: results[0].range(at: 3))!)
+        #endif
         
         showName = showName.replacingOccurrences(of: ".", with: " ", options: .init(rawValue: 0), range: nil)
         showName = showName.replacingOccurrences(of: "\\d{4}", with: "($1)", options: .regularExpression, range: nil)
+        showName = showName.components(separatedBy: " ").joined(separator: " ")
         
         let targetPath = "\(showName)/Season \(seasonNumber)"
         let targetFile = "\(showName) - s\(seasonNumber)e\(episodeNumber).\(url.pathExtension)"
