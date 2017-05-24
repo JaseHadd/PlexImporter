@@ -44,22 +44,12 @@ for outputLine in test.output {
     
     let fileManager = FileManager()
     let torrentURL = URL(fileURLWithPath: basePath.appending(name))
-    
-    if let resourceValues = try? torrentURL.resourceValues(forKeys: [.isDirectoryKey]) {
-        let torrentPath: String
-        let filePattern: String?
         
-        if resourceValues.isDirectory! {
-            torrentPath = basePath.appending(name)
-        }
-        else {
-            torrentPath = basePath
-            filePattern = name;
-        }
-        
-        let files = try! fileManager.contentsOfDirectory(atPath: torrentPath) // we know at this point that it IS a valid directory
-        print(files);
-        
+    if let files = try? fileManager.contentsOfDirectory(at: torrentURL, includingPropertiesForKeys: nil, options: .skipsSubdirectoryDescendants) {
+        print("Found a directory, with contents ", files);
+    }
+    else if(fileManager.fileExists(atPath: torrentURL.path)) {
+        print("Found a file, ", torrentURL.path)
     }
     else {
         print(basePath.appending(name), "doesn't exist", separator: " ")
