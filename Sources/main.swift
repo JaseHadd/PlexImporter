@@ -138,7 +138,9 @@ for outputLine in test.output {
     let components = outputLine.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
     if components.count < 5 || components[4] != "Done" { continue }
     
-    guard let id = components.first, let name = components.last else { continue }
+    guard let id = components.first else { continue }
+    
+    let name = components.suffix(from: 9) .joined(separator: " ")
     
     let fileManager = FileManager.default
     let torrentURL = URL(fileURLWithPath: basePath.appending(name))
